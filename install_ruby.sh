@@ -5,3 +5,4 @@ if [ $? -ne 0 ]; then
   echo "Failed to install rube and bundler"
   exit 1
 fi
+
