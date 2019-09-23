@@ -2,6 +2,10 @@
 
 cd /home/appuser
 
+git clone git@github.com:Otus-DevOps-2019-08/whoami-io_infra.git
+cd whoami-io_infra
+git checkout cloud-testapp
+
 ./install_ruby.sh
 if [ $? -ne 0 ]; then
   echo "Failed to install ruby"
