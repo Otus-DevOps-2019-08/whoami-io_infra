@@ -2,9 +2,9 @@
 
 cd /home/appuser
 
-git clone git@github.com:Otus-DevOps-2019-08/whoami-io_infra.git
+sudo git clone https://github.com/Otus-DevOps-2019-08/whoami-io_infra.git
 cd whoami-io_infra
-git checkout cloud-testapp
+sudo git checkout cloud-testapp
 
 ./install_ruby.sh
 if [ $? -ne 0 ]; then
@@ -12,13 +12,13 @@ if [ $? -ne 0 ]; then
   exit 1
 fi
 
-./install_mongo.sh
+./install_mongodb.sh
 if [ $? -ne 0 ]; then
   echo "Failed to install mongo
   exit 1
 fi
 
-./deploy.sh
+sudo ./deploy.sh
 if [ $? -ne 0 ]; then
   echo "Failed to deploy reddit"
   exit 1
