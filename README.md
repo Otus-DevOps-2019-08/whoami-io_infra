@@ -55,3 +55,11 @@ Host someinternalhost
 VPN-сервера:
 sslip.io/xip.io  и Let’s Encrypt
 Добавить доменное имя в  Pritunl -> Settings -> Lets Encrypt Domain
+
+
+### Task 4 GCP
+
+```
+testapp_IP = 35.208.161.9
+testapp_port = 9292
+```
