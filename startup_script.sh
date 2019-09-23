@@ -1,5 +1,7 @@
 #!/bin/bash
 
+cd /home/appuser
+
 ./install_ruby.sh
 if [ $? -ne 0 ]; then
   echo "Failed to install ruby"
