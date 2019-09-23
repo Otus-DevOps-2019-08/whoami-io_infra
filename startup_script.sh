@@ -1,52 +1,25 @@
 #!/bin/bash
 
-cd /home/appuser
-
-# install dependencies 
-
-sudo apt update
-sudo apt install -y ruby-full ruby-bundler build-essential
+# install ruby and dependencies
+wget -O - https://raw.githubusercontent.com/Otus-DevOps-2019-08/whoami-io_infra/cloud-testapp/install_ruby.sh | bash
 if [ $? -ne 0 ]; then
-  echo "Failed to install rube and bundler"
+  echo "Failed to install ruby"
   exit 1
 fi
 
 # install db
-
-wget -qO - https://www.mongodb.org/static/pgp/server-3.2.asc | sudo apt-key add
-
-sudo bash -c 'echo "deb http://repo.mongodb.org/apt/ubuntu xenial/mongodb-org/3.2 multiverse" > /etc/apt/sources.list.d/mongodb-org-3.2.list'
-
-sudo apt-get update
-
-sudo apt-get install -y mongodb-org
-
-sudo systemctl start mongod
+wget -O - https://raw.githubusercontent.com/Otus-DevOps-2019-08/whoami-io_infra/cloud-testapp/install_mongodb.sh | bash
 if [ $? -ne 0 ]; then
-  echo "Failed to start mongod"
+  echo "Failed to install mongo
   exit 1
 fi
 
-sudo systemctl enable mongod
+# run app
+cd /home/appuser
+
+wget -O - https://raw.githubusercontent.com/Otus-DevOps-2019-08/whoami-io_infra/cloud-testapp/deploy.sh | sudo bash
 if [ $? -ne 0 ]; then
-  echo "Failed to enable mongod"
-  exit 1
-fi
-
-# deploy app
-
-git clone -b monolith https://github.com/express42/reddit.git
-
-cd reddit
-bundle install
-if [ $? -ne 0 ]; then
-  echo "Failed to install with bundle"
-  exit 1
-fi
-
-puma -d
-if [ $? -ne 0 ]; then
-  echo "Failed to start puma in detached mode"
+  echo "Failed to deploy reddit"
   exit 1
 fi
 

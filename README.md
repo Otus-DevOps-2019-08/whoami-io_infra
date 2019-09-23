@@ -59,7 +59,60 @@ sslip.io/xip.io  и Let’s Encrypt
 
 ### Task 4 GCP
 
+Для проверки домашнего задания:
 ```
 testapp_IP = 35.208.161.9
 testapp_port = 9292
 ```
+
+Одна команда для настройки VM и деплоя приложения при помощи `--metadata-from-file startup-script=s` :
+
+```
+gcloud compute instances create reddit-app\
+  --boot-disk-size=10GB \
+  --image-family ubuntu-1604-lts \
+  --image-project=ubuntu-os-cloud \
+  --machine-type=g1-small \
+  --tags puma-server \
+  --restart-on-failure \
+  --network-tier STANDARD \
+  --metadata-from-file startup-script=startup_script.sh
+```
+
+...и дождаться окончания установки :) Можно проверить, зайдя на VM, `bundler -v` и `sudo systemctl status mongod`.
+
+
+То же самое с `--metadata startup-script-url` :
+
+```
+gcloud compute instances create reddit-app\
+  --boot-disk-size=10GB \
+  --image-family ubuntu-1604-lts \
+  --image-project=ubuntu-os-cloud \
+  --machine-type=g1-small \
+  --tags puma-server \
+  --restart-on-failure \
+  --network-tier STANDARD \
+  --metadata-from-file startup-script-url=gs://path-to-script
+  ```
+
+Использовать статический external-ip `35.208.161.9` :
+```
+  gcloud compute instances delete-access-config reddit-app --access-config-name "external-nat"
+```
+
+```
+  gcloud compute instances add-access-config reddit-app --access-config-name="External NAT" --address=35.208.161.9 --network-tier STANDARD
+```
+ 
+Добавить firewall rule:
+
+```
+gcloud compute firewall-rules create default-puma-server \
+	--action allow \
+	--direction ingress \
+	--rules tcp:9292 \
+	--source-ranges 0.0.0.0/0 \
+	--target-tags puma-server
+```
+
