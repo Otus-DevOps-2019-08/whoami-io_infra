@@ -1,0 +1,32 @@
+{
+    "builders": [
+        {
+            "type": "googlecompute",
+            "project_id": "{{user `project_id`}}",
+            "image_name": "reddit-full-{{timestamp}}",
+            "image_family": "reddit-full",
+            "image_description": "full image for reddit-app from devops course",
+            "source_image_family": "reddit-base",
+            "zone": "europe-west1-b",
+            "ssh_username": "appuser",
+            "machine_type": "{{user `machine_type`}}",
+            "network": "default",
+            "disk_type": "pd-standard",
+            "disk_size": 10,
+            "tags": ["puma-server"]
+        }
+    ],
+    "provisioners": [
+       {
+            "type": "file",
+            "source": "files/reddit-start.service",
+            "destination": "/tmp/reddit-start.service"
+       },
+       {
+            "type": "shell",
+            "script": "scripts/deploy.sh",
+            "execute_command": "sudo {{.Path}}"
+       }
+   ]
+}
+

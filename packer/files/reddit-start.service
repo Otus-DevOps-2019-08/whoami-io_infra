@@ -1,0 +1,14 @@
+[Unit]
+Description=StartRedditApp
+
+[Service]
+WorkingDirectory=/home/appuser/reddit
+ExecStart=/usr/local/bin/puma --dir /home/appuser/reddit
+User=appuser
+Type=simple
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
+

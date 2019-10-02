@@ -116,3 +116,96 @@ gcloud compute firewall-rules create default-puma-server \
 	--target-tags puma-server
 ```
 
+### Task 5 Packer
+
+Summary:
+- use Packer
+- prepare 'fry' image for course app.
+- prepare 'bake' image for course app.
+- use 'Systemd unit' to start puma server to get instance with already running app.
+- add sh script to run instance in GCP.
+
+#### Домашнее задание: Сборка образа при помощи Packer
+
+1. Создан образ VM  `reddit-base`(без параметров)
+./packer
+```
+packer build ubuntu16.json
+```
+2. Создан образ VM `reddit-base` (с параметрами)
+
+./packer 
+```
+packer build -var-file=variables.json.example  ubuntu16.json
+```
+
+3. Запускаем инстанс из созданного образа и на нем сразу
+же имеем запущенное приложение:
+
+Cобираем образ:
+
+./packer 
+```
+packer build -var-file=variables.json.example  immutable.json
+```
+Чтобы собрать образ на основе 'reddit-base', указываем: 
+
+./immutable.json
+```
+"source_image_family": "reddit-base",
+```
+
+Чтобы приложение сразу запустилось, добавим автозапуск команды `puma -d` при помощи Systemd: 
+
+./files/reddit-start.service
+
+```
+[Unit]
+Description=StartRedditApp // что делает сервис, просто полезное описание
+
+[Service]
+ExecStart=/usr/local/bin/puma --dir /home/appuser/reddit // эквивалент puma -d, требует абсолютные пути
+
+[Install]
+WantedBy=multi-user.target // разрешить запуск из консоли
+```
+
+Добавим этот шаг в immutable.json:
+
+./packer/immutable.json
+```  ...
+    "provisioners": [
+       {
+            "type": "file",
+            "source": "files/reddit-start.service",
+            "destination": "/tmp/reddit-start.service" // куда положить файл
+       },
+              {
+            "type": "shell",
+            "script": "scripts/deploy.sh", 
+	    /*
+	    // sudo mv /tmp/reddit-start.service /etc/systemd/system/ // перекопировать файл в дефолтную директорию
+	    // и помечаем файл как только на чтение/запись, но не выполнение
+            // sudo chmod 664 /etc/systemd/system/reddit-start.service
+	    // systemctl daemon-reload // чтобы systemd подгружало изменения в конфиг-файлах
+            // sudo systemctl start reddit-start // запустить сервис
+	    // sudo systemctl enable reddit-start // запускать сервис при загрузке 
+	    //
+	    */
+            "execute_command": "sudo {{.Path}}"
+       }
+       ...
+```
+
+Cобираем образ:
+
+./packer 
+```
+packer build -var-file=variables.json.example  immutable.json
+```
+
+4. Запустить одной командой инстанс в GCP с запущенным приложением:
+```
+./config-scripts/create-redditvm.sh
+```
+
