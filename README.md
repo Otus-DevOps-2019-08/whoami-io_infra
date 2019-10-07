@@ -209,3 +209,46 @@ packer build -var-file=variables.json.example  immutable.json
 ./config-scripts/create-redditvm.sh
 ```
 
+### Task 6 Terraform (1)
+
+#### В процессе сделано:
+
+ - добавлен main.tf
+ - - описание ресурса google-cloud для создания VM инстанса и правила файервола + добавление ключей ssh для appuser
+ - - используется reddit-base image и скрипты для деплоя из предыдущего дз
+ - получаем внешний адрес запущенного инстанса outputs.tf
+ - прокидывем переменные из variables.tf. Значения берутся из terraform.tfvars (см для примера terraform.tfvars.example) или дефолтные значения (см region и zone из variables.tf)
+ 
+#### Как запустить:
+
+```
+cd ./terraform
+```
+
+Убедиться, что установлена версия terraform 0.12.8:
+```
+terraform -v
+```
+
+Проверить, какие изменения применятся:
+```
+terraform plan
+```
+
+Применить изменения:
+```
+terraform apply
+```
+
+Результатом будет запущенное приложение на `<public-external-ip>:9292`
+
+##### Отформатировать конфигурационные файлы
+```
+terraform fmt
+```
+
+#### Удалить созданные terraform-ом ресурсы:
+```
+terraform destroy
+```
+
