@@ -1,0 +1,29 @@
+{
+  "_meta": {
+    "hostvars": {
+      "appserver": {
+        "ansible_host": "35.233.56.201"
+      },
+      "dbserver": {
+        "ansible_host": "35.205.117.245"
+      }
+    }
+  },
+  "all": {
+    "children": [
+      "app",
+      "db"
+    ]
+  },
+  "app": {
+    "hosts": [
+      "appserver"
+    ]
+  },
+  "db": {
+    "hosts": [
+      "dbserver"
+    ]
+  }
+}
+
