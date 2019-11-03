@@ -2,7 +2,7 @@ resource "google_compute_instance" "app" {
   name         = "reddit-app"
   machine_type = "g1-small"
   zone         = "${var.zone}"
-  tags         = ["reddit-app"]
+  tags         = ["reddit-app", "terraform"]
 
   boot_disk {
     initialize_params {
@@ -27,15 +27,6 @@ resource "google_compute_instance" "app" {
     agent = false
     private_key = "${file(var.private_key_path)}"
     host  = self.network_interface[0].access_config[0].nat_ip
-  }
-
-  provisioner "file" {
-    source      = "${path.module}/files/puma.service"
-    destination = "/tmp/puma.service"
-  }
-
-  provisioner "remote-exec" {
-    script = "${path.module}/files/deploy.sh"
   }
 }
 

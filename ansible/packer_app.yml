@@ -1,0 +1,8 @@
+- name: Install packages
+  hosts: all
+  become: true
+  tasks:
+  - name: Install required packages
+    apt:
+      name: ["ruby-full", "ruby-bundler", "build-essential"]
+      state: present

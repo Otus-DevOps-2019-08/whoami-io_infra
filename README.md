@@ -335,3 +335,57 @@ ansible all -m ping
 ```
 Должно вернуть "ping": "pong" для `appserver` и `dbserver`
 
+
+### Task 9 Ansible (2)
+### Деплой и управление конфигурацией с Ansible
+
+ - [x] Основное ДЗ
+ - [ ] Задание со *
+
+## В процессе сделано:
+ - Собраны новые образы Packer, для этого в provision заменены bashскрипты на Ansible-плейбуки.
+
+```
+ansible-playbook ansible/packer_app.yml 
+ansible-playbook ansible/packer_db.yml 
+```
+
+ - Пересозданы ресурсы terraform. Убраны terraform provisioners для запуска приложения, т.к. это будет делать ansible playbook. Добавлены output variables для получения внутреннего адреса хоста с базой, т.к. по дефолту приложение будет искать базу на 127.0.0.1:27017, а у нас база и приложение находятся на разных хостах.
+
+```
+terraform plan stage
+terraform destroy stage
+```
+
+```
+terraform plan stage
+terraform apply stage
+```
+- Добавлен общий плейбук `ansible/reddit_app_one_play.yml`, один сценарий, несколько тасок. Таскам присвоены теги.
+```
+ansible-playbook ansible/reddit_app_one_play.yml --tags db-tag --check
+ansible-playbook ansible/reddit_app_one_play.yml --tags db-tag
+
+ansible-playbook ansible/reddit_app_one_play.yml --tags app-tag --check
+ansible-playbook ansible/reddit_app_one_play.yml --tags app-tag
+
+ansible-playbook ansible/reddit_app_one_play.yml --tags deploy-tag --check
+ansible-playbook ansible/reddit_app_one_play.yml --tags deploy-tag
+```
+- Добавлен общий плейбук `ansible/reddit_app_multiple_plays.yml`, несколько сценариев, по сценарию на таску. Теги вынесены на верхний уровень.
+```
+команды как в предыдущем примере, но поддерживать плейбук проще
+```
+
+- Добавлен общий плейбук `ansible/site.yml`, по плейбуку на группу тасок. Нет необходимости в тегах.
+```
+ansible-playbook ansible/site.yml 
+```
+
+## Как запустить проект:
+- Собрать имейдж пакером
+- Cоздать ресурсы терраформом
+- Запустить плейбук (можно site.yml) анзиблем
+
+## Как проверить работоспособность:
+ - Например, перейти по ссылке http://{app-extrnal-ip}:9292 и убедиться, что приложение видит базу, например, signup.
