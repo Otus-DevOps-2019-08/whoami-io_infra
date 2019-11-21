@@ -389,3 +389,67 @@ ansible-playbook ansible/site.yml
 
 ## Как проверить работоспособность:
  - Например, перейти по ссылке http://{app-extrnal-ip}:9292 и убедиться, что приложение видит базу, например, signup.
+
+
+
+### Task 10 (ansible 3) 
+### Ansible: работа с ролями и окружениями
+
+ - [x] Основное ДЗ
+ - [ ] Задание со *
+
+## В процессе сделано:
+ - Переносены созданные плейбуки в раздельные роли
+```
+cd roles/app 
+ansible-galaxy init 
+```
+```
+cd roles/db 
+ansible-galaxy init 
+```
+ - По-прежнему 2 окружения: stage, prod
+ - Используется коммьюнити роль nginx
+ ```
+ansible-galaxy install -r environments/stage/requirements.yml
+```
+ - Используется Ansible Vault, чтобы хранить конфиги с паролями в зашифрованном виде
+Пример конфига, который будем шифровать
+ansible/environments/stage/credentials.yml
+```
+credentials:
+  users:
+    admin:
+      password: <secret password>
+      groups: sudo
+```
+
+Ключ (произвольная строка текста) храним в надежном месте.
+```
+ ~/.ansible/vault.key
+```
+
+```
+ansible-vault encrypt <file>
+ansible-vault edit <file>
+ansible-vault decrypt <file>
+```
+
+
+## Как запустить проект:
+ - собрать образ при помощи Packer 
+ - поднять stage при помощи  Terraform 
+```
+terraform plan
+terraform apply
+```
+- убедиться, что в настройках ansible используются правильные адреса ресурсов, поднятых в предыдущем шаге
+ - прокатить плейбуки (все включены в site.yml) на stage (по-умолчанию именно это окружение)
+```
+ansible-playbook site.yml --check
+ansible-playbook site.yml
+```
+
+## Как проверить работоспособность:
+ - Например, перейти по ссылке http://<external-app-ip>:9292
+ - Также приложение использует роль nginx и доступно на порту 80 или просто  http://<external-app-ip>
